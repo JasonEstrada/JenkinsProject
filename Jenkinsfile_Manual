@@ -24,10 +24,10 @@ pipeline {
                     
                     // 2. Eliminar contenedores viejos
                     bat "docker rm -f app-manual-${params.BRANCH_TO_DEPLOY} || true"
-                    
+
                     // 3. Desplegar el nuevo contenedor
                     // Usamos las variables Groovy (appPort, imageName) dentro de sh
-                    sh "docker run -d --name app-manual-${params.BRANCH_TO_DEPLOY} -p ${appPort}:3000 ${imageName}"
+                    bat "docker run -d --name app-manual-${params.BRANCH_TO_DEPLOY} -p ${appPort}:3000 ${imageName}"
                     
                     echo "Aplicación desplegada manualmente en http://localhost:${appPort}"
                 }
