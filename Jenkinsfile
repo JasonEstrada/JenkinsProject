@@ -25,11 +25,11 @@ pipeline {
         // --- 2. BUILD (npm install) ---
         stage('Build Tool Install') {
             steps {
-                // 1. Solución para EPROTO
-                bat 'npm config set registry "http://registry.npmjs.org/"'
-                
-                // 2. Solución para EPERM (usando --no-cache)
-                bat 'npm install --no-cache'
+                    bat 'npm config set registry "http://registry.npmjs.org/"' 
+                    
+                    withEnv(['NODE_TLS_REJECT_UNAUTHORIZED=0']) {
+                        bat 'npm install --no-cache'
+                    }
             }
         }
         
