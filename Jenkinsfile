@@ -25,7 +25,9 @@ pipeline {
         // --- 2. BUILD (npm install) ---
         stage('Build Tool Install') {
             steps {
-                bat 'npm install'
+                bat 'npm config set strict-ssl false' 
+
+                bat 'npm install --no-cache'
             }
         }
         
