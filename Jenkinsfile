@@ -25,7 +25,11 @@ pipeline {
         // --- 2. BUILD (npm install) ---
         stage('Build Tool Install') {
             steps {
-                bat 'npm install'
+                // 1. Solución para EPROTO
+                bat 'npm config set strict-ssl false' 
+                
+                // 2. Solución para EPERM (usando --no-cache)
+                bat 'npm install --no-cache'
             }
         }
         
