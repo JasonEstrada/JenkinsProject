@@ -25,7 +25,7 @@ pipeline {
         // --- 2. BUILD (npm install) ---
         stage('Build Tool Install') {
             steps {
-                bat 'npm config set strict-ssl false' 
+                bat 'npm config set registry "http://registry.npmjs.org/"'
 
                 bat 'npm install --no-cache'
             }
