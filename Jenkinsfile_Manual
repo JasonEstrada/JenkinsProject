@@ -7,30 +7,30 @@ pipeline {
         string(name: 'BRANCH_TO_DEPLOY', defaultValue: 'main', description: 'Selecciona la rama a desplegar: main o dev')
     }
 
-    // Variables globales
-    environment {
-        APP_PORT = (params.BRANCH_TO_DEPLOY == 'main') ? '3000' : '3001'
-        IMAGE_NAME = (params.BRANCH_TO_DEPLOY == 'main') ? 'nodemain:v1.0' : 'nodedev:v1.0'
-    }
+    // Nota: Eliminamos el bloque 'environment' que causaba el error
 
     stages {
         // Etapa de Despliegue Manual
         stage('Manual Deployment') {
             steps {
-                echo "Despliegue manual activado para la rama: ${params.BRANCH_TO_DEPLOY}"
-                
-                // 1. Asegurarse de tener la imagen (pull de la imagen que el CICD creó localmente)
-                // Nota: En un entorno de producción, aquí se haría un 'docker pull' de un registro.
-                // Como las imágenes se construyeron localmente, asumimos que están disponibles o las volvemos a construir
-                // Para mantener la simplicidad del laboratorio, usamos la que se construyó en el otro pipeline.
-                
-                // 2. Eliminar contenedores viejos
-                sh "docker rm -f app-manual-${params.BRANCH_TO_DEPLOY} || true"
-                
-                // 3. Desplegar el nuevo contenedor
-                sh "docker run -d --name app-manual-${params.BRANCH_TO_DEPLOY} -p ${APP_PORT}:3000 ${IMAGE_NAME}"
-                
-                echo "Aplicación desplegada manualmente en http://localhost:${APP_PORT}"
+                script {
+                    echo "Despliegue manual activado para la rama: ${params.BRANCH_TO_DEPLOY}"
+                    
+                    // 1. Definir variables de Groovy con la lógica condicional
+                    def appPort = (params.BRANCH_TO_DEPLOY == 'main') ? '3000' : '3001'
+                    def imageName = (params.BRANCH_TO_DEPLOY == 'main') ? 'nodemain:v1.0' : 'nodedev:v1.0'
+                    
+                    echo "Intentando desplegar ${imageName} en el puerto ${appPort}:3000"
+                    
+                    // 2. Eliminar contenedores viejos
+                    sh "docker rm -f app-manual-${params.BRANCH_TO_DEPLOY} || true"
+                    
+                    // 3. Desplegar el nuevo contenedor
+                    // Usamos las variables Groovy (appPort, imageName) dentro de sh
+                    sh "docker run -d --name app-manual-${params.BRANCH_TO_DEPLOY} -p ${appPort}:3000 ${imageName}"
+                    
+                    echo "Aplicación desplegada manualmente en http://localhost:${appPort}"
+                }
             }
         }
     }
