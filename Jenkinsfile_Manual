@@ -23,7 +23,7 @@ pipeline {
                     echo "Intentando desplegar ${imageName} en el puerto ${appPort}:3000"
                     
                     // 2. Eliminar contenedores viejos
-                    sh "docker rm -f app-manual-${params.BRANCH_TO_DEPLOY} || true"
+                    bat "docker rm -f app-manual-${params.BRANCH_TO_DEPLOY} || true"
                     
                     // 3. Desplegar el nuevo contenedor
                     // Usamos las variables Groovy (appPort, imageName) dentro de sh
