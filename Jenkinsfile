@@ -5,7 +5,6 @@ pipeline {
     
     // Variables globales (puerto y nombre de la imagen)
     environment {
-        // Variables para Docker Hub (Reemplaza 'DOCKER_REGISTRY' con tu usuario)
         DOCKER_REGISTRY = '13102003'
     }
     
@@ -76,14 +75,13 @@ pipeline {
                     def appPort = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? '3000' : '3001'
                     def containerName = "app-${env.BRANCH_NAME}"
                     
-                    echo "Intentando desplegar ${containerName} en el puerto ${appPort}:3000"
+                    def deployImage = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "${env.DOCKER_REGISTRY}/nodemain:v1.0" : "${env.DOCKER_REGISTRY}/nodedev:v1.0"
+
+                    echo "Intentando desplegar ${deployImage} en el puerto ${appPort}:3000"
                     
-                    // 1. Eliminar contenedores viejos
                     bat "docker rm -f ${containerName} || true"
                     
-                    // 2. Desplegar el nuevo contenedor (usando la imagen recién subida/descargada)
-                    // NOTA: Si usaste DOCKER_REGISTRY, la imagen debe ser descargada para asegurar que es la subida.
-                    bat "docker run -d --name ${containerName} -p ${appPort}:3000 ${DOCKER_REGISTRY}/${containerName.replace('app-', '')}:v1.0"
+                    bat "docker run -d --name ${containerName} -p ${appPort}:3000 ${deployImage}"
                     
                     echo "Aplicación desplegada en http://localhost:${appPort}"
                 }
