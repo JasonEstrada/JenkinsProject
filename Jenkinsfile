@@ -6,7 +6,7 @@ pipeline {
     // Variables globales (puerto y nombre de la imagen)
     environment {
         // Variables para Docker Hub (Reemplaza 'DOCKER_REGISTRY' con tu usuario)
-        DOCKER_REGISTRY = 'jasonestrada1310'
+        DOCKER_REGISTRY = '13102003'
     }
     
     tools {
