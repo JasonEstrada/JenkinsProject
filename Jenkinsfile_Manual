@@ -1,4 +1,4 @@
-// Jenkinsfile_Manual (para el pipeline regular 'CD_deploy_manual')
+// Jenkinsfile_Manual (corregido)
 
 pipeline {
     agent any
@@ -7,27 +7,32 @@ pipeline {
         string(name: 'BRANCH_TO_DEPLOY', defaultValue: 'main', description: 'Selecciona la rama a desplegar: main o dev')
     }
 
-    // Nota: Eliminamos el bloque 'environment' que causaba el error
+    // AÑADIR DOCKER_REGISTRY A LA ETAPA MANUAL
+    environment {
+        DOCKER_REGISTRY = '13102003' // <--- AÑADE ESTO
+    }
 
     stages {
-        // Etapa de Despliegue Manual
         stage('Manual Deployment') {
             steps {
                 script {
                     echo "Despliegue manual activado para la rama: ${params.BRANCH_TO_DEPLOY}"
                     
-                    // 1. Definir variables de Groovy con la lógica condicional
+                    // 1. Definir variables
                     def appPort = (params.BRANCH_TO_DEPLOY == 'main') ? '3000' : '3001'
-                    def imageName = (params.BRANCH_TO_DEPLOY == 'main') ? 'nodemain:v1.0' : 'nodedev:v1.0'
                     
-                    echo "Intentando desplegar ${imageName} en el puerto ${appPort}:3000"
+                    // 2. CONSTRUIR EL NOMBRE COMPLETO DE LA IMAGEN (incluyendo el registro/usuario)
+                    def imageTag = (params.BRANCH_TO_DEPLOY == 'main') ? 'nodemain:v1.0' : 'nodedev:v1.0'
+                    def fullImageName = "${env.DOCKER_REGISTRY}/${imageTag}" // <--- USAR DOCKER_REGISTRY
                     
-                    // 2. Eliminar contenedores viejos
-                    bat "docker rm -f app-manual-${params.BRANCH_TO_DEPLOY} || true"
+                    echo "Intentando desplegar ${fullImageName} en el puerto ${appPort}:3000"
+                    
+                    // 3. Eliminar contenedores viejos
+                    def containerName = "app-manual-${params.BRANCH_TO_DEPLOY}"
+                    bat "docker rm -f ${containerName} || true"
 
-                    // 3. Desplegar el nuevo contenedor
-                    // Usamos las variables Groovy (appPort, imageName) dentro de sh
-                    bat "docker run -d --name app-manual-${params.BRANCH_TO_DEPLOY} -p ${appPort}:3000 ${imageName}"
+                    // 4. Desplegar el nuevo contenedor (usando fullImageName)
+                    bat "docker run -d --name ${containerName} -p ${appPort}:3000 ${fullImageName}" // <--- USAR fullImageName
                     
                     echo "Aplicación desplegada manualmente en http://localhost:${appPort}"
                 }
