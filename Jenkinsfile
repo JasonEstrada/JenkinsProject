@@ -5,7 +5,7 @@ pipeline {
     
     // Variables globales (puerto y nombre de la imagen)
     environment {
-        DOCKER_REGISTRY = 'jasonestrada1310'
+        DOCKER_REGISTRY = '13102003'
     }
     
     tools {
